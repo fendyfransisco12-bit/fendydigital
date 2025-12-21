@@ -80,10 +80,18 @@ export default function AdminPanel() {
 
   const handleSubmitProject = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.title || !formData.description || !formData.category) {
+      alert('Isikan title, description, dan category!');
+      return;
+    }
+
     setLoading(true);
+    console.log('🚀 Starting submit...');
     
     try {
       const projectData = {
+        name: formData.title,
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -93,35 +101,63 @@ export default function AdminPanel() {
         color: formData.color,
       };
 
+      console.log('📤 Submitting:', projectData);
+
+      // Simple test first
+      console.log('🔍 Testing /api/projects endpoint...');
+      const testResp = await fetch('/api/projects');
+      console.log('✅ Endpoint responds, status:', testResp.status);
+
+      let url = '/api/projects';
+      let method = 'POST';
+      
       if (editingId) {
-        // Update existing project
-        const response = await fetch(`/api/projects/${editingId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(projectData),
-        });
-        const data = await response.json();
-        if (data.success) {
+        url = `/api/projects/${editingId}`;
+        method = 'PUT';
+      }
+
+      console.log(`📤 Sending ${method} to ${url}`);
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(projectData),
+      });
+
+      console.log('📥 Got response, status:', response.status);
+      
+      const contentType = response.headers.get('content-type');
+      console.log('📥 Content-Type:', contentType);
+      
+      if (!contentType?.includes('application/json')) {
+        console.error('❌ Response is not JSON!');
+        const text = await response.text();
+        console.error('Response body:', text.substring(0, 200));
+        alert('Server error: not JSON response. Check console.');
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('📥 Response data:', data);
+
+      if (data.success) {
+        console.log('✅ Success!');
+        if (editingId) {
           setProjects(projects.map(p => p.id === editingId ? data.data : p));
-        }
-      } else {
-        // Create new project
-        const response = await fetch('/api/projects', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(projectData),
-        });
-        const data = await response.json();
-        if (data.success) {
+        } else {
           setProjects([...projects, data.data]);
         }
+        resetForm();
+        setCurrentPage('projects');
+        alert('Project berhasil disimpan!');
+      } else {
+        alert('Error: ' + (data.error || 'Unknown error'));
       }
-      resetForm();
-      setCurrentPage('projects');
     } catch (error) {
-      console.error('Failed to save project:', error);
-      alert('Gagal menyimpan project');
+      console.error('❌ Error:', error);
+      alert('Error: ' + String(error));
     } finally {
+      console.log('🏁 Submit completed');
       setLoading(false);
     }
   };
@@ -658,7 +694,8 @@ export default function AdminPanel() {
                   width: '100%',
                   height: '200px',
                   borderRadius: '10px',
-                  background: formData.image || formData.color,
+                  backgroundColor: formData.image ? 'transparent' : formData.color,
+                  backgroundImage: formData.image ? `url(${formData.image})` : 'none',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   display: 'flex',
@@ -674,16 +711,16 @@ export default function AdminPanel() {
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !formData.title || !formData.description || !formData.category}
                   style={{
                     background: 'rgba(255,255,255,0.1)',
                     color: '#ffffff',
                     padding: '12px 30px',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: '5px',
-                    cursor: loading ? 'not-allowed' : 'pointer',
+                    cursor: (loading || !formData.title || !formData.description || !formData.category) ? 'not-allowed' : 'pointer',
                     fontWeight: '700',
-                    opacity: loading ? 0.5 : 1,
+                    opacity: (loading || !formData.title || !formData.description || !formData.category) ? 0.5 : 1,
                   }}
                 >
                   {loading ? 'Menyimpan...' : 'Simpan Project'}
