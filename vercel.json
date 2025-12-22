@@ -3,5 +3,6 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "nodeVersion": "24.x",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "root": "my-app"
 }
