@@ -225,9 +225,9 @@ export default function Portfolio() {
               <p>Over the past year and a half, I've been honing my skills through personal projects, exploring modern web technologies, and creating digital solutions that are both visually appealing and functional.</p>
               <p>I'm ready to apply my knowledge and creativity to develop innovative applications that make a meaningful impact.</p>
               <div className="social-links">
-                <a href="#" className="social-icon"><i className="fab fa-instagram"></i></a>
-                <a href="#" className="social-icon"><i className="fab fa-youtube"></i></a>
-                <a href="#" className="social-icon"><i className="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/fnnex_/" target="_blank" rel="noopener noreferrer" className="social-icon"><i className="fab fa-instagram"></i></a>
+                <a href="https://www.youtube.com/@fnnex_" target="_blank" rel="noopener noreferrer" className="social-icon"><i className="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@fendy055_" target="_blank" rel="noopener noreferrer" className="social-icon"><i className="fab fa-tiktok"></i></a>
               </div>
             </div>
             <div className="about-image">
