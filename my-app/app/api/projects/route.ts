@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PROJECTS } from './shared';
+import { query } from '@/lib/db';
 
 export async function GET() {
-  return NextResponse.json({ success: true, data: PROJECTS });
+  try {
+    console.log('Fetching projects from database...');
+    const projects = await query('SELECT * FROM projects ORDER BY created_at DESC');
+    console.log('Projects fetched:', projects);
+    return NextResponse.json({ success: true, data: projects });
+  } catch (error) {
+    console.error('Failed to fetch projects:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { success: false, error: errorMessage },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, title, description, category, tags, image, color } = body;
+    const { name, title, description, category, tags, image, video, color } = body;
     const projectName = name || title;
 
     if (!projectName || !description || !category) {
@@ -18,20 +30,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newProject = {
-      id: Math.max(...PROJECTS.map(p => p.id), 0) + 1,
-      name: projectName,
-      description,
-      category,
-      image: image || null,
-      color: color || '#3498db',
-      tags: Array.isArray(tags) ? tags : [],
-    };
+    const tagsArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : []);
 
-    PROJECTS.push(newProject);
+    const result = await query(
+      'INSERT INTO projects (title, description, category, tags, image, video, color) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [projectName, description, category, tagsArray, image || null, video || null, color || '#3498db']
+    );
 
-    return NextResponse.json({ success: true, data: newProject }, { status: 201 });
+    return NextResponse.json({ success: true, data: result[0] }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+    console.error('Failed to create project:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json(
+      { success: false, error: errorMessage },
+      { status: 500 }
+    );
   }
 }

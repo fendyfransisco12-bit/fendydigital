@@ -7,8 +7,8 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push('/Projects');
-  }, [router]);
+    router.push('/projects');
+  }, []);
 
   return null;
 }

@@ -18,7 +18,7 @@ interface SkillCategory {
   tools: Array<{ name: string; logo: string }>;
 }
 
-const skillCategories: Record<string, SkillCategory> = {
+const skillCategories: Record<string, SkillCategory> = {  
   design: {
     title: 'Design',
     tools: [
