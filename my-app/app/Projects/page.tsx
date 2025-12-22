@@ -90,6 +90,8 @@ export default function Portfolio() {
   const [selectedTool, setSelectedTool] = useState<string>('');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PROJECTS_PER_PAGE = 3;
 
   // Fetch projects from API
   useEffect(() => {
@@ -113,6 +115,18 @@ export default function Portfolio() {
   const filteredProjects = activeFilter === 'all' 
     ? projects 
     : projects.filter(p => p.category === activeFilter);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
+  const startIndex = (currentPage - 1) * PROJECTS_PER_PAGE;
+  const endIndex = startIndex + PROJECTS_PER_PAGE;
+  const paginatedProjects = filteredProjects.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="bg-black text-white">
@@ -249,31 +263,31 @@ export default function Portfolio() {
           <div className="category-filter">
             <button 
               className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('all')}
+              onClick={() => handleFilterChange('all')}
             >
               ALL
             </button>
             <button 
               className={`filter-btn ${activeFilter === 'coding' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('coding')}
+              onClick={() => handleFilterChange('coding')}
             >
               CODING
             </button>
             <button 
               className={`filter-btn ${activeFilter === 'design' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('design')}
+              onClick={() => handleFilterChange('design')}
             >
               DESIGN
             </button>
             <button 
               className={`filter-btn ${activeFilter === 'video' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('video')}
+              onClick={() => handleFilterChange('video')}
             >
               VIDEO EDITING
             </button>
             <button 
               className={`filter-btn ${activeFilter === 'game' ? 'active' : ''}`}
-              onClick={() => setActiveFilter('game')}
+              onClick={() => handleFilterChange('game')}
             >
               GAME DEVELOPMENT
             </button>
@@ -285,64 +299,173 @@ export default function Portfolio() {
                 <p>Loading projects...</p>
               </div>
             ) : filteredProjects.length > 0 ? (
-              filteredProjects.map(project => (
-                <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)', cursor: 'pointer' }}>
-                  <div 
-                    className="project-image" 
-                    onClick={() => {
-                      if (project.image) {
-                        setSelectedImage(project.image);
-                        setLightboxOpen(true);
-                      }
-                    }}
-                    style={{
-                      width: '100%',
-                      height: '300px',
-                      backgroundImage: project.image ? `url(${project.image})` : 'none',
-                      backgroundSize: 'contain',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat',
-                      backgroundColor: '#0a0a0a',
-                      cursor: project.image ? 'pointer' : 'default',
-                      transition: 'transform 0.3s ease, filter 0.3s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (project.image) {
-                        (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-                        (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-                      (e.currentTarget as HTMLElement).style.filter = 'brightness(1)';
-                    }}
-                  >
-                    {!project.image && <i className="fas fa-image"></i>}
+              <>
+                {paginatedProjects.map(project => (
+                  <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)', cursor: 'pointer' }}>
+                    <div 
+                      className="project-image" 
+                      onClick={() => {
+                        if (project.image) {
+                          setSelectedImage(project.image);
+                          setLightboxOpen(true);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        height: '300px',
+                        backgroundImage: project.image ? `url(${project.image})` : 'none',
+                        backgroundSize: 'contain',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundColor: '#0a0a0a',
+                        cursor: project.image ? 'pointer' : 'default',
+                        transition: 'transform 0.3s ease, filter 0.3s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (project.image) {
+                          (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
+                          (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                        (e.currentTarget as HTMLElement).style.filter = 'brightness(1)';
+                      }}
+                    >
+                      {!project.image && <i className="fas fa-image"></i>}
+                    </div>
+                    <div className="project-content">
+                      <h3>{project.title}</h3>
+                      <p>{project.description}</p>
+                      {project.tags && project.tags.length > 0 && (
+                        <div style={{ marginBottom: '0.5rem' }}>
+                          {project.tags.map((tag, idx) => (
+                            <span key={idx} style={{ display: 'inline-block', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', marginRight: '0.5rem' }}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <span className={`category-badge ${project.category}`}>
+                        {project.category.toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="project-content">
-                    <h3>{project.title}</h3>
-                    <p>{project.description}</p>
-                    {project.tags && project.tags.length > 0 && (
-                      <div style={{ marginBottom: '0.5rem' }}>
-                        {project.tags.map((tag, idx) => (
-                          <span key={idx} style={{ display: 'inline-block', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', marginRight: '0.5rem' }}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <span className={`category-badge ${project.category}`}>
-                      {project.category.toUpperCase()}
-                    </span>
-                  </div>
-                </div>
-              ))
+                ))}
+              </>
             ) : (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#999' }}>
                 <p>No projects yet</p>
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="pagination" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              marginTop: '2rem',
+              flexWrap: 'wrap',
+            }}>
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                style={{
+                  padding: '0.75rem 1rem',
+                  background: currentPage === 1 ? 'rgba(255,255,255,0.1)' : 'rgba(255,165,0,0.3)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '5px',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  opacity: currentPage === 1 ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== 1) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.5)';
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,165,0,0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== 1) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.3)';
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)';
+                  }
+                }}
+              >
+                ← Previous
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    minWidth: '44px',
+                    background: currentPage === page ? 'rgba(255,165,0,0.6)' : 'rgba(255,255,255,0.1)',
+                    color: '#ffffff',
+                    border: currentPage === page ? '1px solid rgba(255,165,0,0.8)' : '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease',
+                    boxShadow: currentPage === page ? '0 0 10px rgba(255,165,0,0.4)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentPage !== page) {
+                      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.3)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,165,0,0.5)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentPage !== page) {
+                      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.1)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)';
+                    }
+                  }}
+                >
+                  {page}
+                </button>
+              ))}
+
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: '0.75rem 1rem',
+                  background: currentPage === totalPages ? 'rgba(255,255,255,0.1)' : 'rgba(255,165,0,0.3)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '5px',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  opacity: currentPage === totalPages ? 0.5 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== totalPages) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.5)';
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,165,0,0.5)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== totalPages) {
+                    (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.3)';
+                    (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)';
+                  }
+                }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
