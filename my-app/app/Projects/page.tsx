@@ -160,10 +160,13 @@ export default function Portfolio() {
       newIndex = currentIndex === 0 ? maxIndex : currentIndex - 1;
     }
 
-    setSlideDirection(prev => ({
-      ...prev,
-      [projectId]: direction === 'next' ? 'left' : 'right'
-    }));
+    setSlideDirection(prev => {
+      const newDirection: "left" | "right" = direction === 'next' ? 'left' : 'right';
+      return {
+        ...prev,
+        [projectId]: newDirection
+      };
+    });
 
     setProjectImageIndices(prev => ({
       ...prev,
@@ -542,7 +545,7 @@ export default function Portfolio() {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const currentIdx = projectImageIndices[project.id] || 0;
-                                    const direction = idx > currentIdx ? 'left' : 'right';
+                                    const direction: "left" | "right" = idx > currentIdx ? 'left' : 'right';
                                     setSlideDirection(prev => ({
                                       ...prev,
                                       [project.id]: direction
