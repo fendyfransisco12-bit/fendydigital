@@ -10,6 +10,7 @@ interface Project {
   category: string;
   tags?: string[];
   image?: string;
+  images?: string[];
   video?: string;
   color?: string;
 }
@@ -22,25 +23,49 @@ export default function AdminPanel() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    category: string;
+    tags: string;
+    image: string;
+    images: string[];
+    video: string;
+    color: string;
+  }>({
     title: '',
     description: '',
     category: '',
     tags: '',
     image: '',
+    images: [],
     video: '',
     color: 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
   });
   const [editingId, setEditingId] = useState<string | number | null>(null);
+  const [profileImage, setProfileImage] = useState<string>('');
 
   const ADMIN_PASSWORD = 'admin@123';
 
-  // Fetch projects from API
+  // Fetch projects and profile from API
   useEffect(() => {
     if (isLoggedIn) {
       fetchProjects();
+      fetchProfile();
     }
   }, [isLoggedIn]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch('/api/profile');
+      const data = await response.json();
+      if (data.success) {
+        setProfileImage(data.data.profileImage || '');
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -78,6 +103,44 @@ export default function AdminPanel() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAddImage = (imageUrl: string) => {
+    if (imageUrl.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, imageUrl.trim()]
+      }));
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileImage }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Profile berhasil diperbarui!');
+        fetchProfile();
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert('Gagal memperbarui profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmitProject = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -97,6 +160,7 @@ export default function AdminPanel() {
         category: formData.category,
         tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
         image: formData.image,
+        images: formData.images.length > 0 ? formData.images : undefined,
         video: formData.video,
         color: formData.color,
       };
@@ -169,6 +233,7 @@ export default function AdminPanel() {
       category: '',
       tags: '',
       image: '',
+      images: [],
       video: '',
       color: 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
     });
@@ -182,6 +247,7 @@ export default function AdminPanel() {
       category: project.category,
       tags: project.tags?.join(', ') || '',
       image: project.image || '',
+      images: project.images || [],
       video: project.video || '',
       color: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
     });
@@ -311,7 +377,7 @@ export default function AdminPanel() {
           <i className="fas fa-crown"></i> Admin
         </h2>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {['dashboard', 'projects', 'add-project'].map(page => (
+          {['dashboard', 'projects', 'add-project', 'profile'].map(page => (
             <li key={page}>
               <button
                 onClick={() => setCurrentPage(page)}
@@ -345,6 +411,7 @@ export default function AdminPanel() {
                 {page === 'dashboard' && <><i className="fas fa-chart-line"></i> Dashboard</>}
                 {page === 'projects' && <><i className="fas fa-folder"></i> Kelola Projects</>}
                 {page === 'add-project' && <><i className="fas fa-plus-circle"></i> Tambah Project</>}
+                {page === 'profile' && <><i className="fas fa-user-circle"></i> Profile Gambar</>}
               </button>
             </li>
           ))}
@@ -387,6 +454,7 @@ export default function AdminPanel() {
             {currentPage === 'dashboard' && 'Dashboard'}
             {currentPage === 'projects' && 'Kelola Projects'}
             {currentPage === 'add-project' && (editingId ? 'Edit Project' : 'Tambah Project Baru')}
+            {currentPage === 'profile' && 'Pengaturan Profile'}
           </h1>
           <span style={{ color: '#ffffff' }}>Admin {loading && '(Loading...)'}</span>
         </div>
@@ -647,7 +715,7 @@ export default function AdminPanel() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: formData.category === 'video' ? 'none' : 'block' }}>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link (URL)</label>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Gambar Utama (URL)</label>
                   <input
                     type="text"
                     name="image"
@@ -664,6 +732,7 @@ export default function AdminPanel() {
                       boxSizing: 'border-box',
                     }}
                   />
+                  <p style={{ color: '#999999', fontSize: '0.85rem', marginTop: '0.5rem' }}>Gambar pertama yang ditampilkan</p>
                 </div>
                 <div style={{ display: formData.category === 'video' ? 'block' : 'none' }}>
                   <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link Embed</label>
@@ -685,6 +754,134 @@ export default function AdminPanel() {
                   />
                 </div>
               </div>
+
+              {/* Multiple Images Section */}
+              {formData.category !== 'video' && (
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>📷 Tambah Gambar Carousel (Maksimal 10)</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.7rem', marginBottom: '1rem' }}>
+                    <input
+                      type="text"
+                      id="imageInput"
+                      placeholder="Paste URL gambar di sini..."
+                      style={{
+                        padding: '12px',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        borderRadius: '5px',
+                        background: 'rgba(10,10,10,0.5)',
+                        color: '#ffffff',
+                        boxSizing: 'border-box',
+                      }}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const input = e.currentTarget.value;
+                          if (formData.images.length < 10) {
+                            handleAddImage(input);
+                            e.currentTarget.value = '';
+                          }
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = (document.getElementById('imageInput') as HTMLInputElement);
+                        if (formData.images.length < 10) {
+                          handleAddImage(input.value);
+                          input.value = '';
+                        }
+                      }}
+                      style={{
+                        padding: '12px 20px',
+                        background: 'rgba(255,165,0,0.3)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(255,165,0,0.5)',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                        fontWeight: '700',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      + Tambah
+                    </button>
+                  </div>
+
+                  {/* Image List */}
+                  {formData.images.length > 0 && (
+                    <div style={{
+                      background: 'rgba(10,10,10,0.3)',
+                      padding: '1rem',
+                      borderRadius: '5px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                    }}>
+                      <p style={{ color: '#cccccc', marginBottom: '0.8rem', fontSize: '0.9rem' }}>
+                        <i className="fas fa-check-circle"></i> {formData.images.length} gambar ditambahkan
+                      </p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '0.8rem' }}>
+                        {formData.images.map((img, idx) => (
+                          <div key={idx} style={{
+                            position: 'relative',
+                            width: '100%',
+                            paddingBottom: '100%',
+                            borderRadius: '5px',
+                            overflow: 'hidden',
+                            background: 'rgba(0,0,0,0.5)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                          }}>
+                            <img
+                              src={img}
+                              alt={`gambar-${idx}`}
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(idx)}
+                              style={{
+                                position: 'absolute',
+                                top: '5px',
+                                right: '5px',
+                                background: 'rgba(255,0,0,0.8)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '24px',
+                                height: '24px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.9rem',
+                                padding: 0,
+                              }}
+                            >
+                              ✕
+                            </button>
+                            <div style={{
+                              position: 'absolute',
+                              bottom: '5px',
+                              left: '5px',
+                              background: 'rgba(0,0,0,0.7)',
+                              color: '#ffffff',
+                              padding: '2px 6px',
+                              borderRadius: '3px',
+                              fontSize: '0.75rem',
+                            }}>
+                              {idx + 1}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Color</label>
@@ -767,6 +964,81 @@ export default function AdminPanel() {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Profile Settings */}
+        {currentPage === 'profile' && (
+          <div>
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(26,26,26,0.6) 0%, rgba(10,10,10,0.8) 100%)',
+              padding: '2rem',
+              borderRadius: '10px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(10px)',
+            }}>
+              <form onSubmit={handleUpdateProfile}>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>📷 URL Gambar Profile About Me</label>
+                  <input
+                    type="text"
+                    value={profileImage}
+                    onChange={(e) => setProfileImage(e.target.value)}
+                    placeholder="Paste URL gambar profile di sini..."
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      borderRadius: '5px',
+                      background: 'rgba(10,10,10,0.5)',
+                      color: '#ffffff',
+                      boxSizing: 'border-box',
+                      marginBottom: '1rem',
+                    }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Preview Profile Image</label>
+                  <div style={{
+                    width: '100%',
+                    height: '300px',
+                    borderRadius: '10px',
+                    backgroundColor: '#1a1a1a',
+                    backgroundImage: profileImage ? `url(${profileImage})` : 'none',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}>
+                    {!profileImage && <i className="fas fa-image" style={{ fontSize: '4rem', color: 'white', opacity: 0.7 }}></i>}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    type="submit"
+                    disabled={loading || !profileImage}
+                    style={{
+                      background: 'rgba(255,255,255,0.1)',
+                      color: '#ffffff',
+                      padding: '12px 30px',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: '5px',
+                      cursor: (loading || !profileImage) ? 'not-allowed' : 'pointer',
+                      fontWeight: '700',
+                      opacity: (loading || !profileImage) ? 0.5 : 1,
+                    }}
+                  >
+                    {loading ? 'Menyimpan...' : 'Simpan Profile Image'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

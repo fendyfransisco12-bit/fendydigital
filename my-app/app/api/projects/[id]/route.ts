@@ -9,13 +9,14 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
     const projectId = parseInt(id);
-    const { title, description, category, tags, image, video, color } = body;
+    const { title, description, category, tags, image, images, video, color } = body;
 
     const tagsArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : undefined);
+    const imagesArray = Array.isArray(images) ? images : undefined;
 
     const result = await query(
-      'UPDATE projects SET title = COALESCE($1, title), description = COALESCE($2, description), category = COALESCE($3, category), tags = COALESCE($4, tags), image = COALESCE($5, image), video = COALESCE($6, video), color = COALESCE($7, color), updated_at = CURRENT_TIMESTAMP WHERE id = $8 RETURNING *',
-      [title || null, description || null, category || null, tagsArray || null, image || null, video || null, color || null, projectId]
+      'UPDATE projects SET title = COALESCE($1, title), description = COALESCE($2, description), category = COALESCE($3, category), tags = COALESCE($4, tags), image = COALESCE($5, image), images = COALESCE($6, images), video = COALESCE($7, video), color = COALESCE($8, color), updated_at = CURRENT_TIMESTAMP WHERE id = $9 RETURNING *',
+      [title || null, description || null, category || null, tagsArray || null, image || null, imagesArray || null, video || null, color || null, projectId]
     );
 
     if (result.length === 0) {

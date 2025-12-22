@@ -163,14 +163,21 @@ body {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
 }
 
 .hamburger span {
-    width: 25px;
-    height: 3px;
-    background: white;
-    margin: 5px 0;
-    transition: 0.3s;
+    width: 24px;
+    height: 2.5px;
+    background: #ffa500;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+    display: block;
 }
 
 /* Hero Section */
@@ -787,11 +794,13 @@ body {
         top: 100%;
         left: 0;
         right: 0;
-        background: #000000;
+        background: linear-gradient(180deg, rgba(0,0,0,0.98) 0%, rgba(15,15,15,0.95) 100%);
         flex-direction: column;
         gap: 0;
-        padding: 1rem 0;
-        border-top: 1px solid rgba(255,255,255,0.1);
+        padding: 0.5rem 0;
+        border-top: 1px solid rgba(255,165,0,0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
 
     .nav-menu.active {
@@ -799,8 +808,19 @@ body {
     }
 
     .nav-menu a {
-        padding: 0.8rem 2rem;
+        padding: 1rem 2rem;
         display: block;
+        color: #ffffff;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+        position: relative;
+    }
+
+    .nav-menu a:hover {
+        background: rgba(255,165,0,0.08);
+        border-left-color: #ffa500;
+        padding-left: 2.5rem;
     }
 
     .hero {
