@@ -284,7 +284,7 @@ export default function Portfolio() {
               </div>
             ) : filteredProjects.length > 0 ? (
               filteredProjects.map(project => (
-                <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%)' }}>
+                <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)' }}>
                   <div className="project-image" style={project.image ? { backgroundImage: `url(${project.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
                     {!project.image && <i className="fas fa-image"></i>}
                   </div>

@@ -29,7 +29,7 @@ export default function AdminPanel() {
     tags: '',
     image: '',
     video: '',
-    color: 'linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%)',
+    color: 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
   });
   const [editingId, setEditingId] = useState<string | number | null>(null);
 
@@ -170,7 +170,7 @@ export default function AdminPanel() {
       tags: '',
       image: '',
       video: '',
-      color: 'linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%)',
+      color: 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
     });
     setEditingId(null);
   };
@@ -183,7 +183,7 @@ export default function AdminPanel() {
       tags: project.tags?.join(', ') || '',
       image: project.image || '',
       video: project.video || '',
-      color: project.color || 'linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%)',
+      color: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
     });
     setEditingId(project.id);
     setCurrentPage('add-project');
@@ -687,7 +687,7 @@ export default function AdminPanel() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Pilih Warna (Fallback)</label>
+                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Color</label>
                 <select
                   name="color"
                   value={formData.color}
@@ -702,9 +702,11 @@ export default function AdminPanel() {
                     boxSizing: 'border-box',
                   }}
                 >
-                  <option value="linear-gradient(135deg, #ff8c00 0%, #ff6b35 100%)">Orange - Red</option>
-                  <option value="linear-gradient(135deg, #ff6b35 0%, #ff8c00 100%)">Red - Orange</option>
-                  <option value="linear-gradient(135deg, #ffa500 0%, #ff8c00 100%)">Light Orange</option>
+                  <option value="linear-gradient(135deg, #242424ff 0%, #0c0c0cff 100%)">Hitam Gelap</option>
+                  <option value="linear-gradient(135deg, #2a2a2aff 0%, #121212ff 100%)">Hitam Medium</option>
+                  <option value="linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)">Hitam Terang</option>
+                  <option value="linear-gradient(135deg, #3d3d3dff 0%, #222222ff 100%)">Hitam Sangat Terang</option>
+                  <option value="linear-gradient(135deg, #464646ff 0%, #262626ff 100%)">Hitam Paling Terang</option>
                 </select>
               </div>
 
