@@ -15,7 +15,25 @@
 
 html {
     scroll-behavior: smooth;
-    background-color: #1a1a1a;
+    background-color: #000000;
+}
+
+/* Custom Scrollbar */
+html::-webkit-scrollbar {
+    width: 12px;
+}
+
+html::-webkit-scrollbar-track {
+    background: #000000;
+}
+
+html::-webkit-scrollbar-thumb {
+    background: #222222;
+    border-radius: 6px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+    background: #333333;
 }
 
 body {

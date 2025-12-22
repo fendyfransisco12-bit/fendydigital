@@ -88,6 +88,8 @@ export default function Portfolio() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [toolModalOpen, setToolModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<string>('');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string>('');
 
   // Fetch projects from API
   useEffect(() => {
@@ -284,8 +286,37 @@ export default function Portfolio() {
               </div>
             ) : filteredProjects.length > 0 ? (
               filteredProjects.map(project => (
-                <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)' }}>
-                  <div className="project-image" style={project.image ? { backgroundImage: `url(${project.image})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
+                <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)', cursor: 'pointer' }}>
+                  <div 
+                    className="project-image" 
+                    onClick={() => {
+                      if (project.image) {
+                        setSelectedImage(project.image);
+                        setLightboxOpen(true);
+                      }
+                    }}
+                    style={{
+                      width: '100%',
+                      height: '300px',
+                      backgroundImage: project.image ? `url(${project.image})` : 'none',
+                      backgroundSize: 'contain',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundColor: '#0a0a0a',
+                      cursor: project.image ? 'pointer' : 'default',
+                      transition: 'transform 0.3s ease, filter 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (project.image) {
+                        (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
+                        (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                      (e.currentTarget as HTMLElement).style.filter = 'brightness(1)';
+                    }}
+                  >
                     {!project.image && <i className="fas fa-image"></i>}
                   </div>
                   <div className="project-content">
@@ -614,6 +645,69 @@ export default function Portfolio() {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Image Lightbox Modal */}
+      {lightboxOpen && selectedImage && (
+        <div 
+          className="lightbox-modal"
+          onClick={() => setLightboxOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1002,
+            backdropFilter: 'blur(5px)',
+          }}
+        >
+          <div 
+            className="lightbox-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <button
+              onClick={() => setLightboxOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '-50px',
+                right: '0',
+                background: 'none',
+                border: 'none',
+                color: '#ffffff',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              ✕
+            </button>
+            
+            <img 
+              src={selectedImage}
+              alt="Project"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '90vh',
+                objectFit: 'contain',
+                borderRadius: '10px',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
+              }}
+            />
           </div>
         </div>
       )}
