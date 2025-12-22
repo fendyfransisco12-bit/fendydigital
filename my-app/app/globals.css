@@ -843,6 +843,8 @@ body {
 
     .about-content {
         grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column-reverse;
     }
 
     .image-placeholder {
