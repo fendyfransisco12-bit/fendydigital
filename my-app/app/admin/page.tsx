@@ -625,15 +625,35 @@ export default function AdminPanel() {
                 />
               </div>
 
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Tag (pisahkan dengan koma)</label>
+                <input
+                  type="text"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleFormChange}
+                  placeholder="React, Node.js, MongoDB"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRadius: '5px',
+                    background: 'rgba(10,10,10,0.5)',
+                    color: '#ffffff',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                <div>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Tag (pisahkan dengan koma)</label>
+                <div style={{ display: formData.category === 'video' ? 'none' : 'block' }}>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link (URL)</label>
                   <input
                     type="text"
-                    name="tags"
-                    value={formData.tags}
+                    name="image"
+                    value={formData.image}
                     onChange={handleFormChange}
-                    placeholder="React, Node.js, MongoDB"
+                    placeholder="https://example.com/image.jpg"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -645,14 +665,14 @@ export default function AdminPanel() {
                     }}
                   />
                 </div>
-                <div>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link (URL)</label>
+                <div style={{ display: formData.category === 'video' ? 'block' : 'none' }}>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link Embed</label>
                   <input
                     type="text"
-                    name="image"
-                    value={formData.image}
+                    name="video"
+                    value={formData.video}
                     onChange={handleFormChange}
-                    placeholder="https://example.com/image.jpg"
+                    placeholder="https://www.youtube.com/embed/VIDEO_ID"
                     style={{
                       width: '100%',
                       padding: '12px',

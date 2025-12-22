@@ -18,4 +18,14 @@ export const PROJECTS = [
     color: '#e74c3c',
     tags: ['Adobe XD', 'Illustrator'],
   },
+  {
+    id: 3,
+    name: 'Corporate Video Edit',
+    description: 'Professional video editing untuk corporate presentation',
+    category: 'video editing',
+    image: 'https://via.placeholder.com/400x300?text=Video+Edit',
+    video: 'https://www.youtube.com/embed/jNgP6d9HraI',
+    color: '#9b59b6',
+    tags: ['Premiere Pro', 'After Effects', 'Color Grading'],
+  },
 ];
