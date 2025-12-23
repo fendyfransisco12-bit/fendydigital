@@ -421,9 +421,10 @@ export default function Portfolio() {
                         style={{
                           position: 'relative',
                           width: '100%',
-                          height: '300px',
+                          aspectRatio: '1 / 1',
+                          height: 'auto',
                           backgroundImage: coverImage ? `url(${coverImage})` : 'none',
-                          backgroundSize: 'cover',
+                          backgroundSize: 'contain',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
                           backgroundColor: '#0a0a0a',
@@ -661,7 +662,7 @@ export default function Portfolio() {
                           </>
                         )}
                       </div>
-                      <div className="project-content">
+                      <div className="project-content" style={{ paddingTop: '1rem' }}>
                         <h3>{project.title}</h3>
                         <p>{project.description}</p>
                         {project.tags && project.tags.length > 0 && (
@@ -673,46 +674,10 @@ export default function Portfolio() {
                             ))}
                           </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginTop: '1.5rem' }}>
                           <span className={`category-badge ${project.category}`}>
                             {project.category.toUpperCase()}
                           </span>
-                          {project.video && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (project.video) {
-                                  setSelectedVideo(project.video);
-                                  setVideoModalOpen(true);
-                                }
-                              }}
-                              style={{
-                                background: 'rgba(255,165,0,0.2)',
-                                border: '1px solid rgba(255,165,0,0.5)',
-                                color: '#ffa500',
-                                padding: '6px 12px',
-                                borderRadius: '5px',
-                                cursor: 'pointer',
-                                fontSize: '0.85rem',
-                                fontWeight: '600',
-                                transition: 'all 0.3s ease',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                              }}
-                              onMouseEnter={(e) => {
-                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.3)';
-                                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 10px rgba(255,165,0,0.4)';
-                              }}
-                              onMouseLeave={(e) => {
-                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.2)';
-                                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
-                              }}
-                            >
-                              <i className="fas fa-play"></i>
-                              Play Video
-                            </button>
-                          )}
                         </div>
                       </div>
                     </div>

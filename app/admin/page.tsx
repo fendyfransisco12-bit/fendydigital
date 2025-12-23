@@ -1048,7 +1048,9 @@ export default function AdminPanel() {
                 <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Preview Project</label>
                 <div style={{
                   width: '100%',
-                  height: '200px',
+                  maxWidth: '400px',
+                  aspectRatio: '1 / 1',
+                  height: 'auto',
                   borderRadius: '10px',
                   backgroundColor: formData.image ? 'transparent' : formData.color,
                   backgroundImage: formData.image ? `url(${formData.image})` : 'none',

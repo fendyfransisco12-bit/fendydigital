@@ -569,6 +569,7 @@ body {
     color: #ffffff;
     order: 3;
     margin-top: auto;
+    text-align: center;
 }
 
 .category-badge.coding {
