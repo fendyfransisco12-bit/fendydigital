@@ -31,6 +31,7 @@ export default function AdminPanel() {
     image: string;
     images: string[];
     video: string;
+    videoCover?: string;
     color: string;
   }>({
     title: '',
@@ -40,6 +41,7 @@ export default function AdminPanel() {
     image: '',
     images: [],
     video: '',
+    videoCover: '',
     color: 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)',
   });
   const [editingId, setEditingId] = useState<string | number | null>(null);
@@ -162,6 +164,7 @@ export default function AdminPanel() {
         image: formData.image,
         images: formData.images.length > 0 ? formData.images : undefined,
         video: formData.video,
+        videoCover: formData.videoCover || undefined,
         color: formData.color,
       };
 
@@ -629,7 +632,7 @@ export default function AdminPanel() {
             <form onSubmit={handleSubmitProject}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
                 <div>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Nama Project *</label>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Name Project</label>
                   <input
                     type="text"
                     name="title"
@@ -648,7 +651,7 @@ export default function AdminPanel() {
                   />
                 </div>
                 <div>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Kategori *</label>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Category</label>
                   <select
                     name="category"
                     value={formData.category}
@@ -674,7 +677,7 @@ export default function AdminPanel() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Deskripsi *</label>
+                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -694,7 +697,7 @@ export default function AdminPanel() {
               </div>
 
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Tag (pisahkan dengan koma)</label>
+                <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Tag</label>
                 <input
                   type="text"
                   name="tags"
@@ -735,13 +738,13 @@ export default function AdminPanel() {
                   <p style={{ color: '#999999', fontSize: '0.85rem', marginTop: '0.5rem' }}>Gambar pertama yang ditampilkan</p>
                 </div>
                 <div style={{ display: formData.category === 'video' ? 'block' : 'none' }}>
-                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Link Embed</label>
+                  <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>🎥 Link Embed Video</label>
                   <input
                     type="text"
                     name="video"
                     value={formData.video}
                     onChange={handleFormChange}
-                    placeholder="https://www.youtube.com/embed/VIDEO_ID"
+                    placeholder="https://www.youtube.com/embed/VIDEO_ID atau https://www.youtube.com/watch?v=VIDEO_ID"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -750,8 +753,142 @@ export default function AdminPanel() {
                       background: 'rgba(10,10,10,0.5)',
                       color: '#ffffff',
                       boxSizing: 'border-box',
+                      marginBottom: '1rem',
                     }}
                   />
+                  
+                  {/* Video Thumbnail Preview */}
+                  {formData.video && (
+                    <div style={{
+                      background: 'rgba(10,10,10,0.5)',
+                      padding: '1rem',
+                      borderRadius: '5px',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      marginBottom: '1rem',
+                    }}>
+                      <p style={{ color: '#cccccc', marginBottom: '0.8rem', fontSize: '0.9rem', fontWeight: '700' }}>
+                        📺 Preview Cover Video (YouTube Thumbnail):
+                      </p>
+                      {(() => {
+                        let videoId = '';
+                        if (formData.video.includes('youtu.be/')) {
+                          videoId = formData.video.split('youtu.be/')[1]?.split('?')[0] || '';
+                        } else if (formData.video.includes('youtube.com/embed/')) {
+                          videoId = formData.video.split('/embed/')[1]?.split('?')[0] || '';
+                        } else if (formData.video.includes('youtube.com/watch?v=')) {
+                          videoId = formData.video.split('v=')[1]?.split('&')[0] || '';
+                        }
+                        
+                        const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : '';
+                        
+                        return (
+                          <div>
+                            {thumbnailUrl ? (
+                              <div style={{
+                                position: 'relative',
+                                width: '100%',
+                                paddingBottom: '56.25%',
+                                height: 0,
+                                overflow: 'hidden',
+                                borderRadius: '5px',
+                                background: '#000000',
+                              }}>
+                                <img
+                                  src={thumbnailUrl}
+                                  alt="YouTube Thumbnail"
+                                  style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    borderRadius: '5px',
+                                  }}
+                                />
+                                <div style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  width: '60px',
+                                  height: '60px',
+                                  background: 'rgba(255,165,0,0.9)',
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '1.5rem',
+                                  color: '#000000',
+                                }}>
+                                  ▶
+                                </div>
+                              </div>
+                            ) : (
+                              <p style={{ color: '#999999', fontSize: '0.9rem' }}>Format URL tidak valid</p>
+                            )}
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                  
+                  <p style={{ color: '#999999', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                    💡 Gunakan format: https://www.youtube.com/embed/VIDEO_ID atau https://www.youtube.com/watch?v=VIDEO_ID
+                  </p>
+
+                  {/* Custom Video Cover */}
+                  <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                    <label style={{ color: '#ffffff', marginBottom: '0.7rem', display: 'block', fontWeight: '700' }}>Cover Video</label>
+                    <p style={{ color: '#cccccc', fontSize: '0.9rem', marginBottom: '0.8rem' }}>
+                      Link Image Cover:
+                    </p>
+                    <input
+                      type="text"
+                      name="videoCover"
+                      value={formData.videoCover || ''}
+                      onChange={handleFormChange}
+                      placeholder="Paste URL cover image di sini (kosongkan untuk gunakan YouTube thumbnail)"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        borderRadius: '5px',
+                        background: 'rgba(10,10,10,0.5)',
+                        color: '#ffffff',
+                        boxSizing: 'border-box',
+                        marginBottom: '1rem',
+                      }}
+                    />
+
+                    {/* Custom Cover Preview */}
+                    {formData.videoCover && (
+                      <div style={{
+                        background: 'rgba(10,10,10,0.3)',
+                        padding: '1rem',
+                        borderRadius: '5px',
+                        border: '1px solid rgba(255,165,0,0.2)',
+                      }}>
+                        <p style={{ color: '#cccccc', marginBottom: '0.8rem', fontSize: '0.9rem', fontWeight: '700' }}>
+                          ✨ Preview Custom Cover:
+                        </p>
+                        <img
+                          src={formData.videoCover}
+                          alt="Custom Cover"
+                          style={{
+                            width: '100%',
+                            maxHeight: '200px',
+                            objectFit: 'cover',
+                            borderRadius: '5px',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                          }}
+                          onError={() => {
+                            console.error('Gagal load custom cover image');
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

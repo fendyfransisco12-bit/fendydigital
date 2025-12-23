@@ -11,6 +11,7 @@ interface Project {
   image?: string;
   images?: string[];
   video?: string;
+  videoCover?: string;
   color?: string;
 }
 
@@ -379,7 +380,7 @@ export default function Portfolio() {
                   const hasMultipleImages = project.images && project.images.length > 1;
                   const displayImage = project.images ? project.images[currentImageIndex] : project.image;
                   
-                  // Extract YouTube video ID or get thumbnail
+                  // Extract YouTube video ID or get thumbnail with fallback
                   const getYouTubeThumbnail = (url: string) => {
                     if (!url) return '';
                     let videoId = '';
@@ -390,8 +391,19 @@ export default function Portfolio() {
                     } else if (url.includes('youtube.com/watch?v=')) {
                       videoId = url.split('v=')[1]?.split('&')[0] || '';
                     }
-                    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+                    // Fallback ke sddefault jika maxresdefault tidak tersedia
+                    return videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : '';
                   };
+
+                  // Determine the cover image: prioritize videoCover > image > YouTube thumbnail
+                  let coverImage = '';
+                  if (project.videoCover) {
+                    coverImage = project.videoCover; // Custom video cover has priority
+                  } else if (displayImage) {
+                    coverImage = displayImage; // Then regular image
+                  } else if (project.video) {
+                    coverImage = getYouTubeThumbnail(project.video); // Then YouTube thumbnail
+                  }
 
                   return (
                     <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)', cursor: 'pointer' }}>
@@ -401,8 +413,8 @@ export default function Portfolio() {
                           if (project.video) {
                             setSelectedVideo(project.video);
                             setVideoModalOpen(true);
-                          } else if (displayImage) {
-                            setSelectedImage(displayImage);
+                          } else if (coverImage) {
+                            setSelectedImage(coverImage);
                             setLightboxOpen(true);
                           }
                         }}
@@ -410,7 +422,7 @@ export default function Portfolio() {
                           position: 'relative',
                           width: '100%',
                           height: '300px',
-                          backgroundImage: project.video ? `url(${getYouTubeThumbnail(project.video)})` : displayImage ? `url(${displayImage})` : 'none',
+                          backgroundImage: coverImage ? `url(${coverImage})` : 'none',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
@@ -428,7 +440,7 @@ export default function Portfolio() {
                           (e.currentTarget as HTMLElement).style.filter = 'brightness(1)';
                         }}
                       >
-                        {!displayImage && !project.video && <i className="fas fa-image"></i>}
+                        {!coverImage && <i className="fas fa-image"></i>}
 
                         {/* Play Button Overlay for Video */}
                         {project.video && (
@@ -1240,28 +1252,44 @@ export default function Portfolio() {
             
             {/* Handle different video URL formats */}
             {selectedVideo.includes('youtube.com') || selectedVideo.includes('youtu.be') ? (
-              <iframe
-                width="100%"
-                height="100%"
-                src={`${selectedVideo.includes('youtu.be') ? 'https://www.youtube.com/embed/' + selectedVideo.split('/').pop() : selectedVideo.replace('watch?v=', 'embed/')}`}
-                title="Project Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+              <div
                 style={{
-                  maxWidth: '90vw',
-                  maxHeight: '90vh',
+                  position: 'relative',
+                  width: '95vw',
+                  maxWidth: '1200px',
+                  aspectRatio: '16 / 9',
+                  height: 'auto',
+                  maxHeight: '85vh',
                   borderRadius: '10px',
+                  overflow: 'hidden',
                   boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
                 }}
-              />
+              >
+                <iframe
+                  src={`${selectedVideo.includes('youtu.be') ? 'https://www.youtube.com/embed/' + selectedVideo.split('/').pop() : selectedVideo.replace('watch?v=', 'embed/')}`}
+                  title="Project Video"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '10px',
+                  }}
+                />
+              </div>
             ) : (
               <video
                 controls
                 autoPlay
                 style={{
-                  maxWidth: '90vw',
-                  maxHeight: '90vh',
+                  width: '95vw',
+                  maxWidth: '1200px',
+                  maxHeight: '85vh',
+                  height: 'auto',
                   borderRadius: '10px',
                   boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
                 }}

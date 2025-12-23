@@ -47,6 +47,11 @@ export async function initializeDatabase() {
     ADD COLUMN IF NOT EXISTS images TEXT[] DEFAULT ARRAY[]::TEXT[];
   `;
 
+  const addVideoCoverColumnQuery = `
+    ALTER TABLE projects
+    ADD COLUMN IF NOT EXISTS video_cover TEXT;
+  `;
+
   const createProfileTableQuery = `
     CREATE TABLE IF NOT EXISTS profile (
       id SERIAL PRIMARY KEY,
@@ -62,6 +67,10 @@ export async function initializeDatabase() {
     // Add images column if it doesn't exist
     await query(addImagesColumnQuery);
     console.log('✅ Images column verified/added');
+
+    // Add video_cover column if it doesn't exist
+    await query(addVideoCoverColumnQuery);
+    console.log('✅ Video Cover column verified/added');
 
     // Create profile table
     await query(createProfileTableQuery);

@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, title, description, category, tags, image, images, video, color } = body;
+    const { name, title, description, category, tags, image, images, video, videoCover, color } = body;
     const projectName = name || title;
 
     if (!projectName || !description || !category) {
@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     const imagesArray = Array.isArray(images) ? images : [];
 
     const result = await query(
-      'INSERT INTO projects (title, description, category, tags, image, images, video, color) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [projectName, description, category, tagsArray, image || null, imagesArray, video || null, color || '#3498db']
+      'INSERT INTO projects (title, description, category, tags, image, images, video, video_cover, color) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      [projectName, description, category, tagsArray, image || null, imagesArray, video || null, videoCover || null, color || '#3498db']
     );
 
     return NextResponse.json({ success: true, data: result[0] }, { status: 201 });
