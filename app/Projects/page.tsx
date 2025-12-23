@@ -602,8 +602,10 @@ export default function Portfolio() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setSelectedVideo(project.video);
-                                setVideoModalOpen(true);
+                                if (project.video) {
+                                  setSelectedVideo(project.video);
+                                  setVideoModalOpen(true);
+                                }
                               }}
                               style={{
                                 background: 'rgba(255,165,0,0.2)',
