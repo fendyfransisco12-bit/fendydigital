@@ -378,13 +378,30 @@ export default function Portfolio() {
                   const currentImageIndex = projectImageIndices[project.id] || 0;
                   const hasMultipleImages = project.images && project.images.length > 1;
                   const displayImage = project.images ? project.images[currentImageIndex] : project.image;
+                  
+                  // Extract YouTube video ID or get thumbnail
+                  const getYouTubeThumbnail = (url: string) => {
+                    if (!url) return '';
+                    let videoId = '';
+                    if (url.includes('youtu.be/')) {
+                      videoId = url.split('youtu.be/')[1]?.split('?')[0] || '';
+                    } else if (url.includes('youtube.com/embed/')) {
+                      videoId = url.split('/embed/')[1]?.split('?')[0] || '';
+                    } else if (url.includes('youtube.com/watch?v=')) {
+                      videoId = url.split('v=')[1]?.split('&')[0] || '';
+                    }
+                    return videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+                  };
 
                   return (
                     <div key={project.id} className="project-card" style={{ background: project.color || 'linear-gradient(135deg, #333333ff 0%, #1a1a1aff 100%)', cursor: 'pointer' }}>
                       <div 
                         className="project-image" 
                         onClick={() => {
-                          if (displayImage) {
+                          if (project.video) {
+                            setSelectedVideo(project.video);
+                            setVideoModalOpen(true);
+                          } else if (displayImage) {
                             setSelectedImage(displayImage);
                             setLightboxOpen(true);
                           }
@@ -393,30 +410,80 @@ export default function Portfolio() {
                           position: 'relative',
                           width: '100%',
                           height: '300px',
-                          backgroundImage: displayImage ? `url(${displayImage})` : 'none',
-                          backgroundSize: 'contain',
+                          backgroundImage: project.video ? `url(${getYouTubeThumbnail(project.video)})` : displayImage ? `url(${displayImage})` : 'none',
+                          backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
                           backgroundColor: '#0a0a0a',
-                          cursor: displayImage ? 'pointer' : 'default',
+                          cursor: 'pointer',
                           overflow: 'hidden',
                           transition: 'transform 0.3s ease, filter 0.3s ease',
                         }}
                         onMouseEnter={(e) => {
-                          if (displayImage) {
-                            (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-                            (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)';
-                          }
+                          (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
+                          (e.currentTarget as HTMLElement).style.filter = 'brightness(1.1)';
                         }}
                         onMouseLeave={(e) => {
                           (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
                           (e.currentTarget as HTMLElement).style.filter = 'brightness(1)';
                         }}
                       >
-                        {!displayImage && <i className="fas fa-image"></i>}
+                        {!displayImage && !project.video && <i className="fas fa-image"></i>}
+
+                        {/* Play Button Overlay for Video */}
+                        {project.video && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: '80px',
+                              height: '80px',
+                              background: 'rgba(255,165,0,0.9)',
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              zIndex: 5,
+                              transition: 'all 0.3s ease',
+                              boxShadow: '0 0 30px rgba(255,165,0,0.6)',
+                            }}
+                            className="play-button"
+                          >
+                            <i
+                              className="fas fa-play"
+                              style={{
+                                fontSize: '1.8rem',
+                                color: '#000000',
+                                marginLeft: '6px',
+                              }}
+                            ></i>
+                          </div>
+                        )}
 
                         {/* Slide Animation Styles */}
                         <style>{`
+                          .play-button {
+                            animation: pulse 2s infinite;
+                          }
+
+                          @keyframes pulse {
+                            0%, 100% {
+                              box-shadow: 0 0 30px rgba(255,165,0,0.6);
+                              transform: translate(-50%, -50%) scale(1);
+                            }
+                            50% {
+                              box-shadow: 0 0 50px rgba(255,165,0,0.8);
+                              transform: translate(-50%, -50%) scale(1.05);
+                            }
+                          }
+
+                          .project-image:hover .play-button {
+                            background: rgba(255,165,0,1);
+                            box-shadow: 0 0 50px rgba(255,165,0,0.9);
+                          }
+
                           @keyframes slideInLeft {
                             from {
                               opacity: 0;
