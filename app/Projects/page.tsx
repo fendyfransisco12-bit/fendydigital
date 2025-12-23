@@ -92,6 +92,8 @@ export default function Portfolio() {
   const [selectedTool, setSelectedTool] = useState<string>('');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>('');
+  const [videoModalOpen, setVideoModalOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [projectImageIndices, setProjectImageIndices] = useState<Record<string | number, number>>({});
   const [slideDirection, setSlideDirection] = useState<Record<string | number, 'left' | 'right'>>({});
@@ -592,9 +594,45 @@ export default function Portfolio() {
                             ))}
                           </div>
                         )}
-                        <span className={`category-badge ${project.category}`}>
-                          {project.category.toUpperCase()}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.75rem' }}>
+                          <span className={`category-badge ${project.category}`}>
+                            {project.category.toUpperCase()}
+                          </span>
+                          {project.video && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedVideo(project.video);
+                                setVideoModalOpen(true);
+                              }}
+                              style={{
+                                background: 'rgba(255,165,0,0.2)',
+                                border: '1px solid rgba(255,165,0,0.5)',
+                                color: '#ffa500',
+                                padding: '6px 12px',
+                                borderRadius: '5px',
+                                cursor: 'pointer',
+                                fontSize: '0.85rem',
+                                fontWeight: '600',
+                                transition: 'all 0.3s ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                              }}
+                              onMouseEnter={(e) => {
+                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.3)';
+                                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 10px rgba(255,165,0,0.4)';
+                              }}
+                              onMouseLeave={(e) => {
+                                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,165,0,0.2)';
+                                (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+                              }}
+                            >
+                              <i className="fas fa-play"></i>
+                              Play Video
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1081,6 +1119,88 @@ export default function Portfolio() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
+
+      {/* Video Modal */}
+      {videoModalOpen && selectedVideo && (
+        <div 
+          className="video-modal"
+          onClick={() => setVideoModalOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1003,
+            backdropFilter: 'blur(5px)',
+          }}
+        >
+          <div 
+            className="video-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <button
+              onClick={() => setVideoModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '-50px',
+                right: '0',
+                background: 'none',
+                border: 'none',
+                color: '#ffffff',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              ✕
+            </button>
+            
+            {/* Handle different video URL formats */}
+            {selectedVideo.includes('youtube.com') || selectedVideo.includes('youtu.be') ? (
+              <iframe
+                width="100%"
+                height="100%"
+                src={`${selectedVideo.includes('youtu.be') ? 'https://www.youtube.com/embed/' + selectedVideo.split('/').pop() : selectedVideo.replace('watch?v=', 'embed/')}`}
+                title="Project Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
+                  borderRadius: '10px',
+                  boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
+                }}
+              />
+            ) : (
+              <video
+                controls
+                autoPlay
+                style={{
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
+                  borderRadius: '10px',
+                  boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
+                }}
+              >
+                <source src={selectedVideo} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
+          </div>
+        </div>
+      )}
